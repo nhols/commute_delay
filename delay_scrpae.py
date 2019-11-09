@@ -42,13 +42,13 @@ def parse_html_delays(filepath):
         df.assign(
             cancelled      = df.status == 'CANC/NR',
             on_time        = df.status.str.contains('RT'),
-            actual_arrival = [re.sub('[CANC/NR|Unknown]', '', x) for x in df.status.str.split(expand = True)[0]],
+            actual_arrive  = [re.sub('[CANC/NR|Unknown]', '', x) for x in df.status.str.split(expand = True)[0]],
             minutes_late   = [re.sub('[RT|L]', '', x) for x in df.status.str.split(expand = True)[1].fillna('')]
         )
     df.loc[df.minutes_late == '', 'minutes_late'] = np.nan
     df['minutes_late'] = df.minutes_late.astype(float)
     df['date'] = pd.to_datetime(df['date'])
-    for hh_mm_col in ['scheduled_depart']:
+    for hh_mm_col in ['scheduled_depart', 'scheduled_arrive', 'actual_arrival']:
         df[hh_mm_col] = df[hh_mm_col].str.replace('*','')
     
     return(df)
