@@ -48,7 +48,7 @@ def parse_html_delays(filepath):
     df.loc[df.minutes_late == '', 'minutes_late'] = np.nan
     df['minutes_late'] = df.minutes_late.astype(float)
     df['date'] = pd.to_datetime(df['date'])
-    for hh_mm_col in ['scheduled_depart', 'scheduled_arrive', 'actual_arrival']:
+    for hh_mm_col in ['scheduled_depart', 'scheduled_arrive', 'actual_arrive']:
         df[hh_mm_col] = df[hh_mm_col].str.replace('*','')
     
     return(df)
