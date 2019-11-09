@@ -38,7 +38,8 @@ def parse_html_delays(filepath):
     df = df.melt(id_vars=['operator', 'scheduled_depart', 'scheduled_arrive', 'duration'], var_name='date', value_name='status')
     df.dropna(inplace=True)
     df['cancelled'] = df.status == 'CANC/NR'
-    df =        df.assign(
+    df =\
+        df.assign(
             cancelled      = df.status == 'CANC/NR',
             on_time        = df.status.str.contains('RT'),
             actual_arrival = [re.sub('[CANC/NR|Unknown]', '', x) for x in df.status.str.split(expand = True)[0]],
@@ -47,6 +48,8 @@ def parse_html_delays(filepath):
     df.loc[df.minutes_late == '', 'minutes_late'] = np.nan
     df['minutes_late'] = df.minutes_late.astype(float)
     df['date'] = pd.to_datetime(df['date'])
+    for hh_mm_col in ['scheduled_depart']:
+        df[hh_mm_col] = df[hh_mm_col].str.replace('*','')
     
     return(df)
 
