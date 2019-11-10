@@ -17,24 +17,25 @@ OUT_HTML    = 'train_delays.html'
 RETURN_HTML = 'train_delays_retrun.html'
 FILE_OUT    = 'delay_history.csv'
 URL_OUT = "https://www.recenttraintimes.co.uk/Home/Search?Op=Srch&Fr=Harrow+%26+Wealdstone+%28HRW%29&To=London+Euston+%28EUS%29&TimTyp=D&TimDay=A&Days=Al&TimPer=Cu&dtFr={}%2F{}%2F{}&dtTo={}%2F{}%2F{}&ShwTim=AvAr&MxArCl=1000&ShwAdv=ShwAdv&TOC=All&ArrSta=5&MetAvg=Mea&MetSpr=RT&MxScDu=&MxSvAg=&MnScCt="
-URL_OUT = URL_OUT.format('01', '08', '2019', '08', '11', '2019')
 URL_RET = "https://www.recenttraintimes.co.uk/Home/Search?Op=Srch&Fr=London+Euston+%28EUS%29&To=Harrow+%26+Wealdstone+%28HRW%29&TimTyp=D&TimDay=A&Days=Al&TimPer=Cu&dtFr={}%2F{}%2F{}&dtTo={}%2F{}%2F{}&ShwTim=AvAr&MxArCl=1000&ShwAdv=ShwAdv&TOC=All&ArrSta=5&MetAvg=Mea&MetSpr=RT&MxScDu=&MxSvAg=&MnScCt="
-URL_RET = URL_RET.format('01', '08', '2019', '08', '11', '2019')
 
+URL_OUT = URL_OUT.format('02', '08', '2019', '09', '11', '2019')
+URL_RET = URL_RET.format('02', '08', '2019', '09', '11', '2019')
+date_cols = pd.date_range('08/02/2019','11/09/2019')
 
 # In[168]:
 
 
 def parse_html_delays(filepath):
-    
+
     try:
         df = pd.read_html(filepath)[1]
     except:
         print(pd.read_html(filepath)[0])
         
     df = df.droplevel(axis=1,level=0)
-    df = df[list(df.columns.values[0:4]) + list(df.columns.values[23:])]
-    df.columns = ['operator', 'scheduled_depart', 'scheduled_arrive', 'duration', '1/11/2019'] + [re.sub('[^0-9/]+ ', '', x) + '/2019' for x in df.columns.values[5:]]
+    df.drop(['RT-5m late','Average', 'Today'], axis = 1, inplace = True)
+    df.columns = ['operator', 'scheduled_depart', 'scheduled_arrive', 'duration'] + date_cols.tolist()[::-1]
     df = df.melt(id_vars=['operator', 'scheduled_depart', 'scheduled_arrive', 'duration'], var_name='date', value_name='status')
     df.dropna(inplace=True)
     df['cancelled'] = df.status == 'CANC/NR'
